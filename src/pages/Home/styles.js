@@ -1,37 +1,8 @@
 import styled from 'styled-components';
-import { Badge, ListGroup } from 'react-bootstrap';
+import { Card } from 'react-bootstrap';
 
-export const ListIssues = styled(ListGroup)`
-  .active {
-    a {
-      color: #fff;
-    }
-
-    .btn-link {
-      color: #fff;
-    }
+export const CardIssue = styled(Card)`
+  .card-body {
+    margin: 2px 15px;
   }
-
-  .list-group-item {
-    display: flex;
-    flex-direction: row;
-
-    .title {
-      flex: 1;
-      flex-direction: column;
-      cursor: pointer;
-    }
-    .actions {
-      flex-direction: row;
-
-      svg {
-        margin: 5px;
-      }
-    }
-  }
-`;
-
-export const Labels = styled(Badge)`
-  margin: 2px;
-  background-color: #${props => props.color || '#fff'} !important;
 `;

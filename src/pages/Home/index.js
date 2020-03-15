@@ -1,17 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import differenceBy from 'lodash/differenceBy';
-import { Button, Col, Container, ListGroup, Row } from 'react-bootstrap';
-import { MdFavorite, MdDone } from 'react-icons/md';
+import { Card, Col, Container, Row } from 'react-bootstrap';
 import ReactMarkdown from 'react-markdown';
+import breaks from 'remark-breaks';
+
+import { CardIssue } from './styles';
 
 import api from '../../services/api';
-import { Labels, ListIssues } from './styles';
+
+import Issues from '../../components/Issues';
 
 export default function Home() {
-  const [bodyIssue, setBodyIssue] = useState('');
-  const [activeIssue, setActiveIssue] = useState('');
   const [issues, setIssues] = useState([]);
   const [issuesDone, setIssuesDone] = useState([]);
+
+  const [bodyIssue, setBodyIssue] = useState('');
+  const [activeIssue, setActiveIssue] = useState('');
 
   useEffect(() => {
     const fetchIssuesDone = JSON.parse(localStorage.getItem('issues:done'));
@@ -36,11 +40,14 @@ export default function Home() {
     setBodyIssue(body);
   }
 
-  function markIssueAsDone(issueDone) {
+  function markIssueAsDone(index, issueDone) {
     setIssuesDone([...issuesDone, issueDone]);
 
     const issueIsNotDone = issues.filter(issue => issue.id !== issueDone.id);
     setIssues([...issueIsNotDone]);
+
+    setActiveIssue(issues[index + 1].id);
+    setBodyIssue(issues[index + 1].body);
   }
 
   return (
@@ -49,38 +56,22 @@ export default function Home() {
 
       <Row>
         <Col md={4}>
-          <ListIssues>
-            {issues.map(issue => (
-              <ListGroup.Item key={issue.id} active={issue.id === activeIssue}>
-                <div
-                  className="title"
-                  onClick={() => showBodyIssue(issue.id, issue.body)}
-                >
-                  <strong>
-                    <a href={issue.html_url} target="_blank">
-                      #{issue.number}
-                    </a>
-                  </strong>{' '}
-                  - {issue.title}
-                  {issue.labels.map(label => (
-                    <Labels key={label.id} color={label.color}>
-                      {label.name}
-                    </Labels>
-                  ))}
-                </div>
-                <div className="actions">
-                  <Button variant="link" onClick={() => markIssueAsDone(issue)}>
-                    <MdDone />
-                  </Button>
-                  <MdFavorite />
-                </div>
-              </ListGroup.Item>
-            ))}
-          </ListIssues>
+          <Issues
+            issues={issues}
+            active={activeIssue}
+            showBodyIssue={showBodyIssue}
+            markIssueAsDone={markIssueAsDone}
+          />
         </Col>
 
         <Col md={8}>
-          <ReactMarkdown source={bodyIssue} />
+          {bodyIssue ? (
+            <CardIssue>
+              <Card.Body>
+                <ReactMarkdown source={bodyIssue} plugins={[breaks]} />
+              </Card.Body>
+            </CardIssue>
+          ) : null}
         </Col>
       </Row>
     </Container>
