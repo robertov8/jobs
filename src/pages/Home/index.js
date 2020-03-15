@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import differenceBy from 'lodash/differenceBy';
 
 import { Card, Col, Container, Row } from 'react-bootstrap';
 import ReactMarkdown from 'react-markdown';
@@ -13,42 +12,69 @@ import IssuesTabs from '../../components/IssuesTabs';
 
 export default function Home() {
   const [issues, setIssues] = useState([]);
+
+  const [issuesDoneIndex, setIssuesDoneIndex] = useState([]);
   const [issuesDone, setIssuesDone] = useState([]);
-  const [issuesFavorite, setIssuesFavorite] = useState([]);
+
+  const [issuesFavIndex, setIssuesFavIndex] = useState([]);
+  const [issuesFav, setIssuesFav] = useState([]);
 
   const [bodyIssue, setBodyIssue] = useState('');
   const [activeIssue, setActiveIssue] = useState('');
 
   useEffect(() => {
-    const fetchDone = JSON.parse(localStorage.getItem('issues:done'));
+    const fetchDoneIndex = JSON.parse(localStorage.getItem('i:done:index'));
+    const fetchDoneIndexData = fetchDoneIndex || [];
+    setIssuesDoneIndex(fetchDoneIndexData);
+
+    const fetchDone = JSON.parse(localStorage.getItem('i:done'));
     setIssuesDone(fetchDone || []);
 
-    const fetchFavorite = JSON.parse(localStorage.getItem('issues:favorite'));
-    setIssuesFavorite(fetchFavorite || []);
+    const fetchFavIndex = JSON.parse(localStorage.getItem('i:fav:index'));
+    const fetchFavIndexData = fetchFavIndex || [];
+    setIssuesFavIndex(fetchFavIndexData);
+
+    const fetchFav = JSON.parse(localStorage.getItem('i:fav'));
+    setIssuesFav(fetchFav || []);
 
     const fetchIssues = async () => {
       const response = await api.get('frontendbr/vagas/issues?state=open');
 
-      const issueIsNotDone = differenceBy(response.data, fetchDone, 'id');
-      const issueWithFavorites = differenceBy(
-        issueIsNotDone,
-        fetchFavorite,
-        'id'
-      );
+      const issueIsNotDone = response.data.map(issue => {
+        let newIssue = {};
 
-      setIssues(issueWithFavorites);
+        if (fetchDoneIndexData.includes(issue.number)) {
+          newIssue['isDone'] = true;
+        }
+
+        if (fetchFavIndexData.includes(issue.number)) {
+          newIssue['isFav'] = true;
+        }
+
+        return { ...issue, ...newIssue };
+      });
+
+      setIssues(issueIsNotDone);
     };
 
     fetchIssues().then();
   }, []);
 
   useEffect(() => {
-    localStorage.setItem('issues:done', JSON.stringify(issuesDone));
+    localStorage.setItem('i:done', JSON.stringify(issuesDone));
   }, [issuesDone]);
 
   useEffect(() => {
-    localStorage.setItem('issues:favorite', JSON.stringify(issuesFavorite));
-  }, [issuesFavorite]);
+    localStorage.setItem('i:done:index', JSON.stringify(issuesDoneIndex));
+  }, [issuesDoneIndex]);
+
+  useEffect(() => {
+    localStorage.setItem('i:fav', JSON.stringify(issuesFav));
+  }, [issuesFav]);
+
+  useEffect(() => {
+    localStorage.setItem('i:fav:index', JSON.stringify(issuesFavIndex));
+  }, [issuesFavIndex]);
 
   function showBodyIssue(id, body) {
     setActiveIssue(id);
@@ -56,22 +82,48 @@ export default function Home() {
   }
 
   function markIssueAsDone(index, issueDone) {
+    setIssuesDoneIndex([...issuesDoneIndex, issueDone.number]);
     setIssuesDone([...issuesDone, issueDone]);
-
-    const issueIsNotDone = issues.filter(issue => issue.id !== issueDone.id);
-    setIssues([...issueIsNotDone]);
-
-    setActiveIssue(issues[index + 1].id);
-    setBodyIssue(issues[index + 1].body);
+    showNextIssue(index, 'done');
   }
 
-  function markIssueAsFavorite(issueFavorite) {
-    const issueIndex = issues.findIndex(issue => issue.id === issueFavorite.id);
+  function markIssueAsFav(index, issueFavorite) {
+    setIssuesFavIndex([...issuesFavIndex, issueFavorite.number]);
+    setIssuesFav([...issuesFav, issueFavorite]);
+    showNextIssue(index, 'fav');
+  }
 
-    issues[issueIndex]['isFavorite'] = true;
+  function uncheckIssueAsFav(index, issueUncheck) {
+    const issueFav = issuesFav.filter(issue => issue.id !== issueUncheck.id);
+    setIssuesFav([...issueFav]);
 
+    const issueFavIndex = issuesFavIndex.filter(i => i !== issueUncheck.number);
+    setIssuesFavIndex([...issueFavIndex]);
+
+    issues[index].isFav = false;
     setIssues([...issues]);
-    setIssuesFavorite([...issuesFavorite, issueFavorite]);
+  }
+
+  function uncheckIssueAsDone(index, issueUncheck) {
+    const issueDone = issuesDone.filter(issue => issue.id !== issueUncheck.id);
+    setIssuesDone([...issueDone]);
+
+    const issueDoneIndex = issuesDoneIndex.filter(
+      i => i !== issueUncheck.number
+    );
+    setIssuesDoneIndex([...issueDoneIndex]);
+
+    issues[index].isDone = false;
+    setIssues([...issues]);
+  }
+
+  function showNextIssue(index, type) {
+    if (type === 'done') {
+      issues[index].isDone = !issues[index].isDone;
+    } else {
+      issues[index].isFav = !issues[index].isFav;
+    }
+    setIssues([...issues]);
   }
 
   return (
@@ -82,12 +134,14 @@ export default function Home() {
         <Col md={4}>
           <IssuesTabs
             issues={issues}
-            issuesFavorite={issuesFavorite}
+            issuesFavorite={issuesFav}
             issuesDone={issuesDone}
             active={activeIssue}
             showBodyIssue={showBodyIssue}
             markIssueAsDone={markIssueAsDone}
-            markIssueAsFavorite={markIssueAsFavorite}
+            markIssueAsFavorite={markIssueAsFav}
+            uncheckIssueAsFav={uncheckIssueAsFav}
+            uncheckIssueAsDone={uncheckIssueAsDone}
           />
         </Col>
 

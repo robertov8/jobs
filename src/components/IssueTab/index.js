@@ -1,19 +1,25 @@
 import React from 'react';
 import { Labels, ListIssues } from './styles';
 import { Button } from 'react-bootstrap';
-import { MdDone, MdFavorite } from 'react-icons/md';
+import { MdDone, MdFavorite, MdClose } from 'react-icons/md';
 
 export default function IssueTab({
   issues,
   active,
   showBodyIssue,
   markIssueAsDone,
+  uncheckIssueAsDone,
   markIssueAsFavorite,
+  uncheckIssueAsFav,
 }) {
   return (
     <>
       {issues.map((issue, index) => (
-        <ListIssues key={issue.id} active={issue.id === active}>
+        <ListIssues
+          key={issue.id}
+          active={issue.id === active}
+          className={issue.isDone ? 'bg-light' : ''}
+        >
           <div
             className="title"
             onClick={() => showBodyIssue(issue.id, issue.body)}
@@ -34,21 +40,30 @@ export default function IssueTab({
               </Labels>
             ))}
           </div>
+
           <div className="actions">
             <Button
-              title="Mark as Read"
+              title={issue.isDone ? 'Uncheck as Read' : 'Mark as Read'}
               variant="link"
-              onClick={() => markIssueAsDone(index, issue)}
+              onClick={() =>
+                issue.isDone
+                  ? uncheckIssueAsDone(index, issue)
+                  : markIssueAsDone(index, issue)
+              }
             >
-              <MdDone />
+              {issue.isDone ? <MdClose /> : <MdDone />}
             </Button>
 
             <Button
-              title="Mark as Favorite"
+              title={issue.isFav ? 'Uncheck as Favorite' : 'Mark as Favorite'}
               variant="link"
-              onClick={() => markIssueAsFavorite(issue)}
+              onClick={() =>
+                issue.isFav
+                  ? uncheckIssueAsFav(index, issue)
+                  : markIssueAsFavorite(index, issue)
+              }
             >
-              <MdFavorite color={issue.isFavorite ? 'red' : 'blue'} />
+              <MdFavorite color={issue.isFav ? 'red' : 'blue'} />
             </Button>
           </div>
         </ListIssues>

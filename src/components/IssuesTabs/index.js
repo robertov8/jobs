@@ -11,7 +11,9 @@ export default function IssuesTabs({
   active,
   showBodyIssue,
   markIssueAsDone,
+  uncheckIssueAsDone,
   markIssueAsFavorite,
+  uncheckIssueAsFav,
 }) {
   return (
     <ListIssuesGroup>
@@ -28,7 +30,9 @@ export default function IssuesTabs({
               active={active}
               showBodyIssue={showBodyIssue}
               markIssueAsDone={markIssueAsDone}
+              uncheckIssueAsDone={uncheckIssueAsDone}
               markIssueAsFavorite={markIssueAsFavorite}
+              uncheckIssueAsFav={uncheckIssueAsFav}
             />
           </Tab>
           <Tab title="Favorite" eventKey="favorite">
@@ -37,7 +41,9 @@ export default function IssuesTabs({
               active={active}
               showBodyIssue={showBodyIssue}
               markIssueAsDone={markIssueAsDone}
+              uncheckIssueAsDone={uncheckIssueAsDone}
               markIssueAsFavorite={markIssueAsFavorite}
+              uncheckIssueAsFav={uncheckIssueAsFav}
             />
           </Tab>
           <Tab title="Done" eventKey="done">
@@ -46,7 +52,9 @@ export default function IssuesTabs({
               active={active}
               showBodyIssue={showBodyIssue}
               markIssueAsDone={markIssueAsDone}
+              uncheckIssueAsDone={uncheckIssueAsDone}
               markIssueAsFavorite={markIssueAsFavorite}
+              uncheckIssueAsFav={uncheckIssueAsFav}
             />
           </Tab>
         </Tabs>
