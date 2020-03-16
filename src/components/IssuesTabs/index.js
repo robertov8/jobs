@@ -28,8 +28,6 @@ export default function IssuesTabs({
           className="mb-1"
         >
           <Tab title="Issues" eventKey="issues">
-            <IssuePagination page={page} paginationPage={paginationPage} />
-
             <IssueTab
               issues={issues}
               active={active}
@@ -40,7 +38,11 @@ export default function IssuesTabs({
               uncheckIssueAsFav={uncheckIssueAsFav}
             />
 
-            <IssuePagination page={page} paginationPage={paginationPage} />
+            <IssuePagination
+              page={page}
+              paginationPage={paginationPage}
+              className="mb-2"
+            />
           </Tab>
           <Tab title="Favorite" eventKey="favorite">
             <IssueTab

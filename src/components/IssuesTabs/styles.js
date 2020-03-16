@@ -7,20 +7,32 @@ import {
 } from 'react-bootstrap';
 
 export const ListIssuesGroup = styled(ListGroup)`
-  .list-group-item {
+  overflow-y: auto;
+  position: fixed;
+  max-width: 30%;
+  height: 94vh;
+
+  .nav-pills {
     display: flex;
-    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
 
-    .title {
-      flex: 1;
-      flex-direction: column;
-      cursor: pointer;
-    }
-    .actions {
+    .list-group-item {
+      display: flex;
       flex-direction: row;
+      align-items: flex-start;
 
-      svg {
-        margin: 5px;
+      .title {
+        flex: 1;
+        flex-direction: column;
+        cursor: pointer;
+      }
+      .actions {
+        flex-direction: row;
+
+        svg {
+          margin: 5px;
+        }
       }
     }
   }

@@ -151,8 +151,6 @@ export default function Home() {
 
   return (
     <Container fluid>
-      <h1>Github - Jobs</h1>
-
       <Row>
         <Col md={4}>
           <IssuesTabs
