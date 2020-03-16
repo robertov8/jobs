@@ -61,7 +61,7 @@ export default function Home() {
     const issueIsNotDone = response.data.map(issue => {
       let newIssue = {};
 
-      if (fetchDone.includes(issue.number)) {
+      if (fetchFavIndex.includes(issue.number)) {
         newIssue['isDone'] = true;
       }
 
