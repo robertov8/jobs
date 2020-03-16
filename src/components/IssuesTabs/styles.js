@@ -1,5 +1,10 @@
 import styled from 'styled-components';
-import { ListGroup } from 'react-bootstrap';
+import {
+  ListGroup,
+  Nav as ReactNav,
+  Tabs as ReactTabs,
+  Tab as ReactTab,
+} from 'react-bootstrap';
 
 export const ListIssuesGroup = styled(ListGroup)`
   .list-group-item {
@@ -20,3 +25,14 @@ export const ListIssuesGroup = styled(ListGroup)`
     }
   }
 `;
+
+export const Nav = styled(ReactNav)`
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+`;
+
+export const Tabs = styled(ReactTabs)``;
+
+export const Tab = styled(ReactTab)``;

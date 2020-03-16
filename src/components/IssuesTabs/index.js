@@ -1,10 +1,13 @@
 import React from 'react';
-import { Nav, Tab, Tabs } from 'react-bootstrap';
 
-import { ListIssuesGroup } from './styles';
+import { ListIssuesGroup, Nav, Tabs, Tab } from './styles';
+
 import IssueTab from '../IssueTab';
+import IssuePagination from '../IssuePagination';
 
 export default function IssuesTabs({
+  page,
+  paginationPage,
   issues,
   issuesFavorite,
   issuesDone,
@@ -25,6 +28,8 @@ export default function IssuesTabs({
           className="mb-1"
         >
           <Tab title="Issues" eventKey="issues">
+            <IssuePagination page={page} paginationPage={paginationPage} />
+
             <IssueTab
               issues={issues}
               active={active}
@@ -34,6 +39,8 @@ export default function IssuesTabs({
               markIssueAsFavorite={markIssueAsFavorite}
               uncheckIssueAsFav={uncheckIssueAsFav}
             />
+
+            <IssuePagination page={page} paginationPage={paginationPage} />
           </Tab>
           <Tab title="Favorite" eventKey="favorite">
             <IssueTab

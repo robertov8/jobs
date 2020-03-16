@@ -1,16 +1,31 @@
 import React, { useEffect, useState } from 'react';
+import { useHistory } from 'react-router-dom';
 
 import { Card, Col, Container, Row } from 'react-bootstrap';
 import ReactMarkdown from 'react-markdown';
+
 import breaks from 'remark-breaks';
+import Octopage from 'github-pagination';
+
+import { useQuery } from '../../utils/router';
+import api from '../../services/api';
+import {
+  getFromLocalStorage,
+  saveToLocalStorage,
+} from '../../services/localStorage';
 
 import { CardIssue } from './styles';
-
-import api from '../../services/api';
 
 import IssuesTabs from '../../components/IssuesTabs';
 
 export default function Home() {
+  const history = useHistory();
+  const page = useQuery().get('page') || 1;
+
+  const URL = 'frontendbr/vagas/issues?state=open';
+
+  const [pagination, setPagination] = useState({});
+
   const [issues, setIssues] = useState([]);
 
   const [issuesDoneIndex, setIssuesDoneIndex] = useState([]);
@@ -23,58 +38,46 @@ export default function Home() {
   const [activeIssue, setActiveIssue] = useState('');
 
   useEffect(() => {
-    const fetchDoneIndex = JSON.parse(localStorage.getItem('i:done:index'));
-    const fetchDoneIndexData = fetchDoneIndex || [];
-    setIssuesDoneIndex(fetchDoneIndexData);
-
-    const fetchDone = JSON.parse(localStorage.getItem('i:done'));
-    setIssuesDone(fetchDone || []);
-
-    const fetchFavIndex = JSON.parse(localStorage.getItem('i:fav:index'));
-    const fetchFavIndexData = fetchFavIndex || [];
-    setIssuesFavIndex(fetchFavIndexData);
-
-    const fetchFav = JSON.parse(localStorage.getItem('i:fav'));
-    setIssuesFav(fetchFav || []);
-
-    const fetchIssues = async () => {
-      const response = await api.get('frontendbr/vagas/issues?state=open');
-
-      const issueIsNotDone = response.data.map(issue => {
-        let newIssue = {};
-
-        if (fetchDoneIndexData.includes(issue.number)) {
-          newIssue['isDone'] = true;
-        }
-
-        if (fetchFavIndexData.includes(issue.number)) {
-          newIssue['isFav'] = true;
-        }
-
-        return { ...issue, ...newIssue };
-      });
-
-      setIssues(issueIsNotDone);
-    };
-
-    fetchIssues().then();
+    loadingData().then(() => {
+      requestIssues(page).then();
+    });
   }, []);
 
-  useEffect(() => {
-    localStorage.setItem('i:done', JSON.stringify(issuesDone));
-  }, [issuesDone]);
+  async function loadingData() {
+    const fetchDoneIndex = getFromLocalStorage('i:done:index', []);
+    setIssuesDoneIndex(fetchDoneIndex);
 
-  useEffect(() => {
-    localStorage.setItem('i:done:index', JSON.stringify(issuesDoneIndex));
-  }, [issuesDoneIndex]);
+    const fetchDone = getFromLocalStorage('i:done', []);
+    setIssuesDone(fetchDone);
 
-  useEffect(() => {
-    localStorage.setItem('i:fav', JSON.stringify(issuesFav));
-  }, [issuesFav]);
+    const fetchFavIndex = getFromLocalStorage('i:fav:index', []);
+    setIssuesFavIndex(fetchFavIndex);
 
-  useEffect(() => {
-    localStorage.setItem('i:fav:index', JSON.stringify(issuesFavIndex));
-  }, [issuesFavIndex]);
+    const fetchFav = getFromLocalStorage('i:fav', []);
+    setIssuesFav(fetchFav);
+  }
+
+  async function requestIssues(page) {
+    const response = await api.get(`${URL}&page=${page}`);
+
+    setPagination(Octopage.parser(response.headers.link));
+
+    const issueIsNotDone = response.data.map(issue => {
+      let newIssue = {};
+
+      if (issuesDoneIndex.includes(issue.number)) {
+        newIssue['isDone'] = true;
+      }
+
+      if (issuesFavIndex.includes(issue.number)) {
+        newIssue['isFav'] = true;
+      }
+
+      return { ...issue, ...newIssue };
+    });
+
+    setIssues(issueIsNotDone);
+  }
 
   function showBodyIssue(id, body) {
     setActiveIssue(id);
@@ -84,13 +87,22 @@ export default function Home() {
   function markIssueAsDone(index, issueDone) {
     setIssuesDoneIndex([...issuesDoneIndex, issueDone.number]);
     setIssuesDone([...issuesDone, issueDone]);
-    showNextIssue(index, 'done');
+    toggleTypeIssue(index, 'done');
+
+    saveToLocalStorage('i:done:index', [...issuesDoneIndex, issueDone.number]);
+    saveToLocalStorage('i:done', [...issuesDone, issueDone]);
   }
 
   function markIssueAsFav(index, issueFavorite) {
     setIssuesFavIndex([...issuesFavIndex, issueFavorite.number]);
     setIssuesFav([...issuesFav, issueFavorite]);
-    showNextIssue(index, 'fav');
+    toggleTypeIssue(index, 'fav');
+
+    saveToLocalStorage('i:fav', [...issuesFav, issueFavorite]);
+    saveToLocalStorage('i:fav:index', [
+      ...issuesFavIndex,
+      issueFavorite.number,
+    ]);
   }
 
   function uncheckIssueAsFav(index, issueUncheck) {
@@ -102,6 +114,9 @@ export default function Home() {
 
     issues[index].isFav = false;
     setIssues([...issues]);
+
+    saveToLocalStorage('i:fav', [...issueFav]);
+    saveToLocalStorage('i:fav:index', [...issueFavIndex]);
   }
 
   function uncheckIssueAsDone(index, issueUncheck) {
@@ -115,15 +130,27 @@ export default function Home() {
 
     issues[index].isDone = false;
     setIssues([...issues]);
+
+    saveToLocalStorage('i:done:index', [...issueDoneIndex]);
+    saveToLocalStorage('i:done', [...issueDone]);
   }
 
-  function showNextIssue(index, type) {
+  function toggleTypeIssue(index, type) {
     if (type === 'done') {
       issues[index].isDone = !issues[index].isDone;
     } else {
       issues[index].isFav = !issues[index].isFav;
     }
     setIssues([...issues]);
+  }
+
+  async function paginationPage(type) {
+    const prevOrNext = type === 'prev' ? 'prev' : 'next';
+
+    if (pagination[prevOrNext]) {
+      history.push(`/?page=${pagination[prevOrNext]}`);
+      requestIssues(pagination[prevOrNext]).then();
+    }
   }
 
   return (
@@ -133,6 +160,8 @@ export default function Home() {
       <Row>
         <Col md={4}>
           <IssuesTabs
+            page={page}
+            paginationPage={paginationPage}
             issues={issues}
             issuesFavorite={issuesFav}
             issuesDone={issuesDone}
