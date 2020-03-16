@@ -38,12 +38,10 @@ export default function Home() {
   const [activeIssue, setActiveIssue] = useState('');
 
   useEffect(() => {
-    loadingData().then(() => {
-      requestIssues(page).then();
-    });
+    loadingData(page).then();
   }, []);
 
-  async function loadingData() {
+  async function loadingData(page) {
     const fetchDoneIndex = getFromLocalStorage('i:done:index', []);
     setIssuesDoneIndex(fetchDoneIndex);
 
@@ -55,9 +53,7 @@ export default function Home() {
 
     const fetchFav = getFromLocalStorage('i:fav', []);
     setIssuesFav(fetchFav);
-  }
 
-  async function requestIssues(page) {
     const response = await api.get(`${URL}&page=${page}`);
 
     setPagination(Octopage.parser(response.headers.link));
@@ -65,11 +61,11 @@ export default function Home() {
     const issueIsNotDone = response.data.map(issue => {
       let newIssue = {};
 
-      if (issuesDoneIndex.includes(issue.number)) {
+      if (fetchDone.includes(issue.number)) {
         newIssue['isDone'] = true;
       }
 
-      if (issuesFavIndex.includes(issue.number)) {
+      if (fetchFavIndex.includes(issue.number)) {
         newIssue['isFav'] = true;
       }
 
@@ -149,7 +145,7 @@ export default function Home() {
 
     if (pagination[prevOrNext]) {
       history.push(`/?page=${pagination[prevOrNext]}`);
-      requestIssues(pagination[prevOrNext]).then();
+      loadingData(pagination[prevOrNext]).then();
     }
   }
 
