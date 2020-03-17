@@ -7,7 +7,8 @@ import IssuePagination from '../IssuePagination';
 
 export default function IssuesTabs({
   page,
-  paginationPage,
+  paginationOptions,
+  paginationActions,
   issues,
   issuesFavorite,
   issuesDone,
@@ -19,7 +20,7 @@ export default function IssuesTabs({
   uncheckIssueAsFav,
 }) {
   return (
-    <ListIssuesGroup>
+    <ListIssuesGroup id="sideBar">
       <Nav variant="pills">
         <Tabs
           defaultActiveKey="issues"
@@ -27,7 +28,7 @@ export default function IssuesTabs({
           variant="pills"
           className="mb-1"
         >
-          <Tab title="Issues" eventKey="issues">
+          <Tab title={`Issues (${issues.length})`} eventKey="issues">
             <IssueTab
               issues={issues}
               active={active}
@@ -40,11 +41,15 @@ export default function IssuesTabs({
 
             <IssuePagination
               page={page}
-              paginationPage={paginationPage}
+              paginationOptions={paginationOptions}
+              paginationActions={paginationActions}
               className="mb-2"
             />
           </Tab>
-          <Tab title="Favorite" eventKey="favorite">
+          <Tab
+            title={`Favorite (${issuesFavorite.length})`}
+            eventKey="favorite"
+          >
             <IssueTab
               issues={issuesFavorite}
               active={active}
@@ -55,7 +60,7 @@ export default function IssuesTabs({
               uncheckIssueAsFav={uncheckIssueAsFav}
             />
           </Tab>
-          <Tab title="Done" eventKey="done">
+          <Tab title={`Done (${issuesDone.length})`} eventKey="done">
             <IssueTab
               issues={issuesDone}
               active={active}

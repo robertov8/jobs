@@ -140,12 +140,12 @@ export default function Home() {
     setIssues([...issues]);
   }
 
-  async function paginationPage(type) {
-    const prevOrNext = type === 'prev' ? 'prev' : 'next';
-
-    if (pagination[prevOrNext]) {
-      history.push(`/?page=${pagination[prevOrNext]}`);
-      loadingData(pagination[prevOrNext]).then();
+  async function paginationActions(type) {
+    if (pagination[type]) {
+      history.push(`/?page=${pagination[type]}`);
+      loadingData(pagination[type]).then(() => {
+        document.getElementById('sideBar').scrollTo(0, 0);
+      });
     }
   }
 
@@ -155,7 +155,8 @@ export default function Home() {
         <Col md={4}>
           <IssuesTabs
             page={page}
-            paginationPage={paginationPage}
+            paginationOptions={pagination}
+            paginationActions={paginationActions}
             issues={issues}
             issuesFavorite={issuesFav}
             issuesDone={issuesDone}

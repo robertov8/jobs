@@ -18,7 +18,7 @@ export default function IssueTab({
         <ListIssues
           key={issue.id}
           active={issue.id === active}
-          className={issue.isDone ? 'bg-light' : ''}
+          variant={issue.isDone ? 'secondary' : ''}
         >
           <div
             className="title"
@@ -63,7 +63,7 @@ export default function IssueTab({
                   : markIssueAsFavorite(index, issue)
               }
             >
-              <MdFavorite color={issue.isFav ? 'red' : 'blue'} />
+              <MdFavorite color={issue.isFav ? 'red' : 'cornflowerblue'} />
             </Button>
           </div>
         </ListIssues>
