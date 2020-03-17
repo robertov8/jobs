@@ -51,7 +51,11 @@ export default function IssueTab({
                   : markIssueAsDone(index, issue)
               }
             >
-              {issue.isDone ? <MdClose /> : <MdDone />}
+              {issue.isDone ? (
+                <MdClose color="black" />
+              ) : (
+                <MdDone color="darkgray" />
+              )}
             </Button>
 
             <Button
@@ -63,7 +67,7 @@ export default function IssueTab({
                   : markIssueAsFavorite(index, issue)
               }
             >
-              <MdFavorite color={issue.isFav ? 'red' : 'cornflowerblue'} />
+              <MdFavorite color={issue.isFav ? 'red' : 'darkgray'} />
             </Button>
           </div>
         </ListIssues>
