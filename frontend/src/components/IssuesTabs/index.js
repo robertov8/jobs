@@ -3,12 +3,10 @@ import React from 'react';
 import { ListIssuesGroup, Nav, Tabs, Tab } from './styles';
 
 import IssueTab from '../IssueTab';
-import IssuePagination from '../IssuePagination';
 
 export default function IssuesTabs({
-  page,
-  paginationOptions,
-  paginationActions,
+  tab,
+  tabSelect,
   issues,
   issuesFavorite,
   issuesDone,
@@ -27,9 +25,12 @@ export default function IssuesTabs({
           id="github"
           variant="pills"
           className="mb-1"
+          activeKey={tab}
+          onSelect={(tab) => tabSelect(tab)}
         >
           <Tab title={`Issues (${issues.length})`} eventKey="issues">
             <IssueTab
+              name="issues"
               issues={issues}
               active={active}
               showBodyIssue={showBodyIssue}
@@ -38,19 +39,13 @@ export default function IssuesTabs({
               markIssueAsFavorite={markIssueAsFavorite}
               uncheckIssueAsFav={uncheckIssueAsFav}
             />
-
-            <IssuePagination
-              page={page}
-              paginationOptions={paginationOptions}
-              paginationActions={paginationActions}
-              className="mb-2"
-            />
           </Tab>
           <Tab
             title={`Favorite (${issuesFavorite.length})`}
             eventKey="favorite"
           >
             <IssueTab
+              name="issuesFavorite"
               issues={issuesFavorite}
               active={active}
               showBodyIssue={showBodyIssue}
@@ -62,6 +57,7 @@ export default function IssuesTabs({
           </Tab>
           <Tab title={`Done (${issuesDone.length})`} eventKey="done">
             <IssueTab
+              name="issuesDone"
               issues={issuesDone}
               active={active}
               showBodyIssue={showBodyIssue}

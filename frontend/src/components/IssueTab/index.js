@@ -4,19 +4,18 @@ import { Button } from 'react-bootstrap';
 import { MdDone, MdFavorite, MdClose } from 'react-icons/md';
 
 export default function IssueTab({
+  name,
   issues,
   active,
   showBodyIssue,
   markIssueAsDone,
-  uncheckIssueAsDone,
   markIssueAsFavorite,
-  uncheckIssueAsFav,
 }) {
   return (
     <>
       {issues.map((issue, index) => (
         <ListIssues
-          key={issue.id}
+          key={issue.number}
           active={issue.id === active}
           variant={issue.isDone ? 'secondary' : ''}
         >
@@ -34,7 +33,7 @@ export default function IssueTab({
               </a>
             </strong>{' '}
             - {issue.title}
-            {issue.labels.map(label => (
+            {issue.labels.map((label) => (
               <Labels key={label.id} color={label.color}>
                 {label.name}
               </Labels>
@@ -45,11 +44,7 @@ export default function IssueTab({
             <Button
               title={issue.isDone ? 'Uncheck as Read' : 'Mark as Read'}
               variant="link"
-              onClick={() =>
-                issue.isDone
-                  ? uncheckIssueAsDone(index, issue)
-                  : markIssueAsDone(index, issue)
-              }
+              onClick={() => markIssueAsDone(index, issue.id, name)}
             >
               {issue.isDone ? (
                 <MdClose color="black" />
@@ -61,11 +56,7 @@ export default function IssueTab({
             <Button
               title={issue.isFav ? 'Uncheck as Favorite' : 'Mark as Favorite'}
               variant="link"
-              onClick={() =>
-                issue.isFav
-                  ? uncheckIssueAsFav(index, issue)
-                  : markIssueAsFavorite(index, issue)
-              }
+              onClick={() => markIssueAsFavorite(index, issue.id, name)}
             >
               <MdFavorite color={issue.isFav ? 'red' : 'darkgray'} />
             </Button>
