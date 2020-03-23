@@ -3,12 +3,21 @@ const githubService = require('../../services/github');
 
 class IssueController {
   async index(req, res) {
-    const issues = await Issue.find().where({ isFav: false, isDone: false });
+    const issues = await Issue.find()
+      .where({ isFav: false, isDone: false })
+      .sort({
+        createdAt: 1,
+      });
     res.json(issues);
   }
 
   async favorite(req, res) {
-    const issues = await Issue.find().where({ isFav: true });
+    const issues = await Issue.find()
+      .where({ isFav: true })
+      .sort({
+        createdAt: 1,
+      });
+
     res.json(issues);
   }
 
@@ -21,7 +30,12 @@ class IssueController {
   }
 
   async done(req, res) {
-    const issues = await Issue.find().where({ isDone: true });
+    const issues = await Issue.find()
+      .where({ isDone: true })
+      .sort({
+        updatedAt: -1,
+      });
+
     res.json(issues);
   }
 
@@ -34,7 +48,7 @@ class IssueController {
   }
 
   async sync(req, res) {
-    let index = 2;
+    let index = 1;
 
     for (let i = 1; i < 50; i += 1) {
       const response = await githubService.get(
@@ -47,7 +61,7 @@ class IssueController {
         break;
       }
 
-      response.data.forEach((issue) => {
+      response.data.forEach(issue => {
         Issue.findOneAndUpdate({ id: issue.id }, issue, {
           upsert: true,
         }).then();

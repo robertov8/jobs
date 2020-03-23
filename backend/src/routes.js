@@ -12,6 +12,6 @@ routes.get('/issues/favorite/:id', IssueController.favoriteId);
 routes.get('/issues/done', IssueController.done);
 routes.get('/issues/done/:id', IssueController.doneId);
 
-routes.get('/sync', IssueController.sync);
+routes.get('/issues/sync', IssueController.sync);
 
 module.exports = routes;
