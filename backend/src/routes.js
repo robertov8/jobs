@@ -6,11 +6,11 @@ const IssueController = require('./app/controllers/IssueController');
 
 routes.get('/issues', IssueController.index);
 
-routes.get('/issues/favorite', IssueController.favorite);
-routes.get('/issues/favorite/:id', IssueController.favoriteId);
+routes.get('/favorites', IssueController.favorite);
+routes.get('/favorites/:id', IssueController.favoriteId);
 
-routes.get('/issues/done', IssueController.done);
-routes.get('/issues/done/:id', IssueController.doneId);
+routes.get('/done', IssueController.done);
+routes.get('/done/:id', IssueController.doneId);
 
 routes.get('/issues/sync', IssueController.sync);
 

@@ -1,22 +1,32 @@
 const Issue = require('../schemas/Issue');
 const githubService = require('../../services/github');
 
+const pagination = 10;
+
 class IssueController {
   async index(req, res) {
+    const page = req.query.page || 1;
+
     const issues = await Issue.find()
       .where({ isFav: false, isDone: false })
       .sort({
         createdAt: 1,
-      });
+      })
+      .skip((page - 1) * pagination)
+      .limit(pagination);
     res.json(issues);
   }
 
   async favorite(req, res) {
+    const page = req.query.page || 1;
+
     const issues = await Issue.find()
       .where({ isFav: true })
       .sort({
         createdAt: 1,
-      });
+      })
+      .skip((page - 1) * pagination)
+      .limit(pagination);
 
     res.json(issues);
   }
@@ -30,11 +40,15 @@ class IssueController {
   }
 
   async done(req, res) {
+    const page = req.query.page || 1;
+
     const issues = await Issue.find()
       .where({ isDone: true })
       .sort({
         updatedAt: -1,
-      });
+      })
+      .skip((page - 1) * pagination)
+      .limit(pagination);
 
     res.json(issues);
   }
@@ -48,8 +62,6 @@ class IssueController {
   }
 
   async sync(req, res) {
-    let index = 1;
-
     for (let i = 1; i < 50; i += 1) {
       const response = await githubService.get(
         `frontendbr/vagas/issues?state=open&page=${i}`
@@ -62,9 +74,13 @@ class IssueController {
       }
 
       response.data.forEach(issue => {
-        Issue.findOneAndUpdate({ id: issue.id }, issue, {
-          upsert: true,
-        }).then();
+        Issue.findOneAndUpdate(
+          { id: issue.id },
+          { ...issue, isDone: false, isFav: false },
+          {
+            upsert: true,
+          }
+        ).then();
       });
     }
 
