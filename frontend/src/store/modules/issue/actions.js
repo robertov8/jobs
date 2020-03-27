@@ -1,32 +1,32 @@
 import {
   LOAD_ISSUE,
-  LOAD_ISSUE_DONE,
-  LOAD_ISSUE_FAVORITE,
+  LOADING_MORE_ISSUE,
   MARK_ISSUE_DONE,
   MARK_ISSUE_FAVORITE,
   SHOW_ISSUE,
   SYNC_ISSUE,
 } from './actionTypes';
 import api from '../../../services/api';
+import { toast } from 'react-toastify';
 
-export function loadIssues() {
+export function loadIssues(tab) {
   return async dispatch => {
-    const response = await api.get('issues');
-    dispatch({ type: LOAD_ISSUE, payload: response.data });
+    const response = await api.get(tab);
+
+    dispatch({ type: LOAD_ISSUE, payload: { issue: response.data, tab } });
   };
 }
 
-export function loadIssuesFavorite() {
-  return async dispatch => {
-    const response = await api.get('issues/favorite');
-    dispatch({ type: LOAD_ISSUE_FAVORITE, payload: response.data });
-  };
-}
+export function loadingMore() {
+  return async (dispatch, getState) => {
+    const { issues } = getState();
+    const page = issues.page + 1;
 
-export function loadIssuesDone() {
-  return async dispatch => {
-    const response = await api.get('issues/done');
-    dispatch({ type: LOAD_ISSUE_DONE, payload: response.data });
+    const response = await api.get(`${issues.tab}?page=${page}`);
+    dispatch({
+      type: LOADING_MORE_ISSUE,
+      payload: { issue: response.data, page },
+    });
   };
 }
 
@@ -34,30 +34,32 @@ export function showIssue(id, body) {
   return { type: SHOW_ISSUE, payload: { id, body } };
 }
 
-export function markIssueAsDone(index, name, id) {
+export function markIssueAsDone(index, id) {
   return async dispatch => {
-    const response = await api.get(`issues/done/${id}`);
+    const response = await api.get(`done/${id}`);
     dispatch({
       type: MARK_ISSUE_DONE,
-      payload: { index, name, issue: response.data },
+      payload: { index, issue: response.data },
     });
   };
 }
 
-export function markIssueAsFavorite(index, name, id) {
+export function markIssueAsFavorite(index, id) {
   return async dispatch => {
-    const response = await api.get(`issues/favorite/${id}`);
+    const response = await api.get(`favorites/${id}`);
     dispatch({
       type: MARK_ISSUE_FAVORITE,
-      payload: { index, name, issue: response.data },
+      payload: { index, issue: response.data },
     });
   };
 }
 
 export function syncIssue() {
   return async dispatch => {
+    toast.info('Syncing issues...');
+
     await api.get('issues/sync');
     dispatch({ type: SYNC_ISSUE });
-    dispatch(loadIssues());
+    dispatch(loadIssues('issues'));
   };
 }

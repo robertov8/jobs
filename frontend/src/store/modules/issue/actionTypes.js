@@ -1,6 +1,5 @@
 export const LOAD_ISSUE = '@issue/LOAD_ISSUE';
-export const LOAD_ISSUE_FAVORITE = '@issue/LOAD_ISSUE_FAVORITE';
-export const LOAD_ISSUE_DONE = '@issue/LOAD_ISSUE_DONE';
+export const LOADING_MORE_ISSUE = '@issue/LOADING_MORE_ISSUE';
 
 export const SHOW_ISSUE = '@issue/SHOW_ISSUE';
 

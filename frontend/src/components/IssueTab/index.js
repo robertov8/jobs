@@ -11,7 +11,7 @@ import {
   markIssueAsFavorite,
 } from '../../store/modules/issue/actions';
 
-export default function IssueTab({ name, index, issue }) {
+export default function IssueTab({ index, issue }) {
   const dispatch = useDispatch();
   const active = useSelector(state => state.issues.active);
 
@@ -43,7 +43,7 @@ export default function IssueTab({ name, index, issue }) {
         <Button
           title={issue.isDone ? 'Uncheck as Read' : 'Mark as Read'}
           variant="link"
-          onClick={() => dispatch(markIssueAsDone(index, name, issue.id))}
+          onClick={() => dispatch(markIssueAsDone(index, issue.id))}
         >
           {issue.isDone ? (
             <MdClose color="black" />
@@ -55,7 +55,7 @@ export default function IssueTab({ name, index, issue }) {
         <Button
           title={issue.isFav ? 'Uncheck as Favorite' : 'Mark as Favorite'}
           variant="link"
-          onClick={() => dispatch(markIssueAsFavorite(index, name, issue.id))}
+          onClick={() => dispatch(markIssueAsFavorite(index, issue.id))}
         >
           <MdFavorite color={issue.isFav ? 'red' : 'darkgray'} />
         </Button>

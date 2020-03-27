@@ -7,8 +7,12 @@ import { MdUpdate } from 'react-icons/md';
 import './config/ReactotronConfig';
 
 import GlobalStyle from './styles/global';
-import Home from './pages/Home';
+import 'react-toastify/dist/ReactToastify.min.css';
+
+import Routes from './routes';
+
 import { syncIssue } from './store/modules/issue/actions';
+import { ToastContainer } from 'react-toastify';
 
 function App() {
   const tabSize = useSelector(state => state.issues.tabSize);
@@ -16,6 +20,9 @@ function App() {
 
   return (
     <>
+      <GlobalStyle />
+      <ToastContainer position="bottom-right" />
+
       <Navbar
         bg="dark"
         variant="dark"
@@ -28,9 +35,7 @@ function App() {
         </Button>
       </Navbar>
 
-      <Home />
-
-      <GlobalStyle />
+      <Routes />
     </>
   );
 }

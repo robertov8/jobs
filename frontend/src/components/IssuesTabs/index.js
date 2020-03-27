@@ -1,20 +1,17 @@
 import React, { useEffect } from 'react';
+import { useParams, useHistory } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { ListIssuesGroup, Nav, Tabs, Tab } from './styles';
+import { ListIssuesGroup, Nav, Tabs, Tab, Loading } from './styles';
 
-import {
-  loadIssues,
-  loadIssuesFavorite,
-  loadIssuesDone,
-} from '../../store/modules/issue/actions';
+import { loadIssues, loadingMore } from '../../store/modules/issue/actions';
 import IssueTab from '../IssueTab';
 
 export default function IssuesTabs() {
-  const tab = useSelector(state => state.issues.tab);
+  const { slug } = useParams();
+  const history = useHistory();
 
-  const issuesFav = useSelector(state => state.issues.favorite);
-  const issuesDone = useSelector(state => state.issues.done);
+  const tab = useSelector(state => state.issues.tab);
   const issues = useSelector(state => {
     return state.issues.issue;
   });
@@ -22,18 +19,40 @@ export default function IssuesTabs() {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    tabSelect(tab);
+    tabSelect(slug);
   }, []);
 
   function tabSelect(tab) {
+    let type;
+
     switch (tab) {
-      case 'issues':
-        return dispatch(loadIssues());
-      case 'favorite':
-        return dispatch(loadIssuesFavorite());
+      case 'done':
+        type = 'done';
+        break;
+      case 'favorites':
+        type = 'favorites';
+        break;
       default:
-        return dispatch(loadIssuesDone());
+        type = 'issues';
+        break;
     }
+
+    history.push(`/${type}`);
+    return dispatch(loadIssues(type));
+  }
+
+  function handleIssueTab() {
+    return (
+      <>
+        {issues.map((issue, index) => (
+          <IssueTab key={issue.id} index={index} issue={issue} />
+        ))}
+
+        <Loading onClick={() => dispatch(loadingMore())}>
+          Loading more...
+        </Loading>
+      </>
+    );
   }
 
   return (
@@ -47,36 +66,15 @@ export default function IssuesTabs() {
           onSelect={tab => tabSelect(tab)}
         >
           <Tab title="Issues" eventKey="issues">
-            {issues.map((issue, index) => (
-              <IssueTab
-                key={issue.id}
-                name="done"
-                index={index}
-                issue={issue}
-              />
-            ))}
+            {tab === 'issues' && handleIssueTab()}
           </Tab>
 
-          <Tab title="Favorite" eventKey="favorite">
-            {issuesFav.map((issue, index) => (
-              <IssueTab
-                key={issue.id}
-                name="done"
-                index={index}
-                issue={issue}
-              />
-            ))}
+          <Tab title="Favorite" eventKey="favorites">
+            {tab === 'favorites' && handleIssueTab()}
           </Tab>
 
           <Tab title="Done" eventKey="done">
-            {issuesDone.map((issue, index) => (
-              <IssueTab
-                key={issue.id}
-                name="done"
-                index={index}
-                issue={issue}
-              />
-            ))}
+            {tab === 'done' && handleIssueTab()}
           </Tab>
         </Tabs>
       </Nav>

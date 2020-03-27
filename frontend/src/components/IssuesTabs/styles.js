@@ -48,3 +48,18 @@ export const Nav = styled(ReactNav)`
 export const Tabs = styled(ReactTabs)``;
 
 export const Tab = styled(ReactTab)``;
+
+export const Loading = styled(ListGroup.Item)`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 15px 0;
+  margin-bottom: 10px;
+  cursor: pointer;
+  background: #f1f1f1;
+  transition: filter 0.2s;
+
+  :hover {
+    filter: brightness(90%);
+  }
+`;

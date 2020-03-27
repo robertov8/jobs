@@ -1,7 +1,7 @@
+import { toast } from 'react-toastify';
 import {
   LOAD_ISSUE,
-  LOAD_ISSUE_DONE,
-  LOAD_ISSUE_FAVORITE,
+  LOADING_MORE_ISSUE,
   MARK_ISSUE_DONE,
   MARK_ISSUE_FAVORITE,
   SHOW_ISSUE,
@@ -9,13 +9,12 @@ import {
 } from './actionTypes';
 
 const STATE = {
+  page: 1,
   tab: 'issues',
   tabSize: 0,
   active: 0,
   body: '',
   issue: [],
-  favorite: [],
-  done: [],
 };
 
 export default function issues(state = STATE, action) {
@@ -23,59 +22,46 @@ export default function issues(state = STATE, action) {
     case LOAD_ISSUE:
       return {
         ...state,
-        tab: 'issues',
-        tabSize: action.payload.length,
+        tab: action.payload.tab,
+        tabSize: action.payload.issue.length,
         active: 0,
         body: '',
-        issue: action.payload,
-        favorite: [],
-        done: [],
+        issue: action.payload.issue,
       };
-    case LOAD_ISSUE_FAVORITE:
+    case LOADING_MORE_ISSUE: {
+      toast.info('Loading more...');
+
+      const moreIssue = [...state.issue, ...action.payload.issue];
       return {
         ...state,
-        tab: 'favorite',
-        tabSize: action.payload.length,
-        active: 0,
-        body: '',
-        issue: [],
-        favorite: action.payload,
-        done: [],
+        page: action.payload.page,
+        issue: moreIssue,
+        tabSize: moreIssue.length,
       };
-    case LOAD_ISSUE_DONE:
-      return {
-        ...state,
-        tab: 'done',
-        tabSize: action.payload.length,
-        active: 0,
-        body: '',
-        issue: [],
-        favorite: [],
-        done: action.payload,
-      };
+    }
     case SHOW_ISSUE:
       return { ...state, active: action.payload.id, body: action.payload.body };
-    case MARK_ISSUE_DONE:
+    case MARK_ISSUE_DONE: {
+      toast.success('Issue was done.');
+
       return markIssue(action.payload, state, 'isDone');
-    case MARK_ISSUE_FAVORITE:
+    }
+    case MARK_ISSUE_FAVORITE: {
+      toast.success('Issue was favorite.');
+
       return markIssue(action.payload, state, 'isFav');
-    case SYNC_ISSUE:
+    }
+    case SYNC_ISSUE: {
+      toast.success('Syncing was completed...');
+
       return { ...state };
+    }
     default:
       return state;
   }
 }
 
 function markIssue(payload, state, type = 'isFav') {
-  switch (payload.name) {
-    case 'issue':
-      state.issue[payload.index][type] = payload.issue[type];
-      return { ...state, issue: [...state.issue] };
-    case 'favorite':
-      state.favorite[payload.index][type] = payload.issue[type];
-      return { ...state, favorite: [...state.favorite] };
-    default:
-      state.done[payload.index][type] = payload.issue[type];
-      return { ...state, done: [...state.done] };
-  }
+  state.issue[payload.index][type] = payload.issue[type];
+  return { ...state, issue: [...state.issue] };
 }
