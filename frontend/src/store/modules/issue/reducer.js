@@ -32,15 +32,20 @@ export default function issues(state = STATE, action) {
         issue: action.payload.issue,
       };
     case LOADING_MORE_ISSUE: {
-      toast.info('Loading more...');
-
       const moreIssue = [...state.issue, ...action.payload.issue];
-      return {
-        ...state,
-        page: action.payload.page,
-        issue: moreIssue,
-        tabSize: moreIssue.length,
-      };
+
+      if (action.payload.issue.length) {
+        toast.info(`Loading more +${action.payload.issue.length}...`);
+
+        return {
+          ...state,
+          page: action.payload.page,
+          issue: moreIssue,
+        };
+      }
+
+      toast.warn('No more...');
+      return { ...state };
     }
     case SHOW_ISSUE:
       return {
