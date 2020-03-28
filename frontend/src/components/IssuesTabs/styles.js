@@ -54,6 +54,7 @@ export const Loading = styled(ListGroup.Item)`
   justify-content: center;
   align-items: center;
   padding: 15px 0;
+  min-width: 350px;
   margin-bottom: 10px;
   cursor: pointer;
   background: #f1f1f1;

@@ -1,8 +1,11 @@
 import {
+  CENTER_BODY_ISSUE,
   LOAD_ISSUE,
   LOADING_MORE_ISSUE,
   MARK_ISSUE_DONE,
   MARK_ISSUE_FAVORITE,
+  NEXT_ISSUE,
+  PREVIOUS_ISSUE,
   SHOW_ISSUE,
   SYNC_ISSUE,
 } from './actionTypes';
@@ -13,7 +16,12 @@ export function loadIssues(tab) {
   return async dispatch => {
     const response = await api.get(tab);
 
-    dispatch({ type: LOAD_ISSUE, payload: { issue: response.data, tab } });
+    const total = response.headers['x-count-total'] || 0;
+
+    dispatch({
+      type: LOAD_ISSUE,
+      payload: { issue: response.data, tab, total },
+    });
   };
 }
 
@@ -23,6 +31,7 @@ export function loadingMore() {
     const page = issues.page + 1;
 
     const response = await api.get(`${issues.tab}?page=${page}`);
+
     dispatch({
       type: LOADING_MORE_ISSUE,
       payload: { issue: response.data, page },
@@ -62,4 +71,42 @@ export function syncIssue() {
     dispatch({ type: SYNC_ISSUE });
     dispatch(loadIssues('issues'));
   };
+}
+
+export function nextIssue() {
+  return dispatch => {
+    dispatch({ type: NEXT_ISSUE });
+    dispatch(centerBodyIssue());
+  };
+}
+
+export function previousIssue() {
+  return dispatch => {
+    dispatch({ type: PREVIOUS_ISSUE });
+    dispatch(centerBodyIssue());
+  };
+}
+
+export function markIssueAsDoneHotKey() {
+  return (dispatch, getState) => {
+    const { issues } = getState();
+
+    const issueIndex = issues.issue.findIndex(i => i.id === issues.active);
+
+    dispatch(markIssueAsDone(issueIndex, issues.active));
+  };
+}
+
+export function markIssueAsFavoriteHotKey() {
+  return (dispatch, getState) => {
+    const { issues } = getState();
+
+    const issueIndex = issues.issue.findIndex(i => i.id === issues.active);
+
+    dispatch(markIssueAsFavorite(issueIndex, issues.active));
+  };
+}
+
+export function centerBodyIssue() {
+  return { type: CENTER_BODY_ISSUE };
 }

@@ -23,7 +23,7 @@ export default function IssuesTabs() {
   }, []);
 
   function tabSelect(tab) {
-    let type;
+    let type = 'issues';
 
     switch (tab) {
       case 'done':
