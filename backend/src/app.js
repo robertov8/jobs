@@ -13,7 +13,10 @@ class App {
   }
 
   middleware() {
-    this.server.use(cors());
+    const corsOptionsDelegate = (req, callback) => {
+      callback(null, { origin: true, exposedHeaders: ['X-Count-Total'] });
+    };
+    this.server.use(cors(corsOptionsDelegate));
   }
 
   routes() {

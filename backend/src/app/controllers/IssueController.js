@@ -1,16 +1,22 @@
 const Issue = require('../schemas/Issue');
 const githubService = require('../../services/github');
 
-const pagination = 10;
+const { tokenGithubAuthorization } = require('../../../.env.js');
+
+const pagination = 30;
 
 class IssueController {
   async index(req, res) {
     const page = req.query.page || 1;
 
+    const issuesCount = await Issue.find({ isFav: false, isDone: false });
+
+    res.header('X-Count-Total', issuesCount.length);
+
     const issues = await Issue.find()
       .where({ isFav: false, isDone: false })
       .sort({
-        createdAt: 1,
+        createdAt: -1,
       })
       .skip((page - 1) * pagination)
       .limit(pagination);
@@ -19,6 +25,10 @@ class IssueController {
 
   async favorite(req, res) {
     const page = req.query.page || 1;
+
+    const issuesCount = await Issue.find({ isFav: true });
+
+    res.header('X-Count-Total', issuesCount.length);
 
     const issues = await Issue.find()
       .where({ isFav: true })
@@ -42,10 +52,14 @@ class IssueController {
   async done(req, res) {
     const page = req.query.page || 1;
 
+    const issuesCount = await Issue.find({ isDone: true });
+
+    res.header('X-Count-Total', issuesCount.length);
+
     const issues = await Issue.find()
       .where({ isDone: true })
       .sort({
-        updatedAt: -1,
+        updatedAt: 1,
       })
       .skip((page - 1) * pagination)
       .limit(pagination);
@@ -64,23 +78,30 @@ class IssueController {
   async sync(req, res) {
     for (let i = 1; i < 50; i += 1) {
       const response = await githubService.get(
-        `frontendbr/vagas/issues?state=open&page=${i}`
+        `frontendbr/vagas/issues?state=open&page=${i}`,
+        {
+          headers: {
+            Authorization: tokenGithubAuthorization || '',
+          },
+        }
       );
-
-      console.log(i, response.data.length);
 
       if (response.data.length === 0) {
         break;
       }
 
       response.data.forEach(issue => {
-        Issue.findOneAndUpdate(
-          { id: issue.id },
-          { ...issue, isDone: false, isFav: false },
-          {
-            upsert: true,
+        Issue.findOne({ id: issue.id }).then(issueResult => {
+          if (!issueResult) {
+            return Issue.create({
+              ...issue,
+              isFav: false,
+              isDone: false,
+            }).then();
           }
-        ).then();
+
+          return issueResult.save({ ...issue }).then();
+        });
       });
     }
 
