@@ -1,6 +1,7 @@
 {
   "scripts": {
-    "dev": "nodemon --delay 1500ms src/server.js"
+    "start": "nodemon --delay 1500ms src/server.js",
+    "docker": "docker-compose up"
   },
   "devDependencies": {
     "@types/axios": "^0.14.0",

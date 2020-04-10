@@ -21,6 +21,10 @@ const IssueSchema = new mongoose.Schema(
     labels: {
       type: Array,
     },
+    repo: {
+      type: String,
+      default: '',
+    },
     isDone: {
       type: Boolean,
       default: false,

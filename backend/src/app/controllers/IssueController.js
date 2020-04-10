@@ -7,14 +7,15 @@ const pagination = 30;
 
 class IssueController {
   async index(req, res) {
-    const page = req.query.page || 1;
+    const { repo } = req.params;
+    const { page = 1 } = req.query;
 
-    const issuesCount = await Issue.find({ isFav: false, isDone: false });
+    const issuesCount = await Issue.find({ repo, isFav: false, isDone: false });
 
     res.header('X-Count-Total', issuesCount.length);
 
     const issues = await Issue.find()
-      .where({ isFav: false, isDone: false })
+      .where({ repo, isFav: false, isDone: false })
       .sort({
         createdAt: -1,
       })
@@ -24,14 +25,15 @@ class IssueController {
   }
 
   async favorite(req, res) {
-    const page = req.query.page || 1;
+    const { repo } = req.params;
+    const { page = 1 } = req.query;
 
-    const issuesCount = await Issue.find({ isFav: true });
+    const issuesCount = await Issue.find({ repo, isFav: true });
 
     res.header('X-Count-Total', issuesCount.length);
 
     const issues = await Issue.find()
-      .where({ isFav: true })
+      .where({ repo, isFav: true })
       .sort({
         createdAt: 1,
       })
@@ -50,16 +52,17 @@ class IssueController {
   }
 
   async done(req, res) {
-    const page = req.query.page || 1;
+    const { repo } = req.params;
+    const { page = 1 } = req.query;
 
-    const issuesCount = await Issue.find({ isDone: true });
+    const issuesCount = await Issue.find({ repo, isDone: true });
 
     res.header('X-Count-Total', issuesCount.length);
 
     const issues = await Issue.find()
-      .where({ isDone: true })
+      .where({ repo, isDone: true })
       .sort({
-        updatedAt: 1,
+        updatedAt: -1,
       })
       .skip((page - 1) * pagination)
       .limit(pagination);
@@ -76,36 +79,49 @@ class IssueController {
   }
 
   async sync(req, res) {
-    for (let i = 1; i < 50; i += 1) {
-      const response = await githubService.get(
-        `frontendbr/vagas/issues?state=open&page=${i}`,
-        {
-          headers: {
-            Authorization: tokenGithubAuthorization || '',
-          },
-        }
-      );
+    const { repo } = req.params;
 
-      if (response.data.length === 0) {
+    let update = 0;
+
+    for (let i = 1; i < 50; i += 1) {
+      try {
+        const response = await githubService.get(
+          `${repo}/vagas/issues?state=open&page=${i}`,
+          {
+            headers: {
+              Authorization: tokenGithubAuthorization || '',
+            },
+          }
+        );
+
+        if (response.data.length === 0) {
+          break;
+        }
+
+        response.data.forEach(issue => {
+          Issue.findOne({ id: issue.id }).then(issueResult => {
+            update += 1;
+            console.log(update);
+
+            if (!issueResult) {
+              return Issue.create({
+                ...issue,
+                repo,
+                isFav: false,
+                isDone: false,
+              }).then();
+            }
+
+            return issueResult.save({ ...issue }).then();
+          });
+        });
+      } catch (e) {
+        console.error(e);
         break;
       }
-
-      response.data.forEach(issue => {
-        Issue.findOne({ id: issue.id }).then(issueResult => {
-          if (!issueResult) {
-            return Issue.create({
-              ...issue,
-              isFav: false,
-              isDone: false,
-            }).then();
-          }
-
-          return issueResult.save({ ...issue }).then();
-        });
-      });
     }
 
-    res.json([]);
+    res.json(update);
   }
 }
 
