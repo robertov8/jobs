@@ -64,7 +64,7 @@ export default function issues(state = STATE, action) {
       return markIssue(action.payload, state, 'isFav');
     }
     case SYNC_ISSUE: {
-      toast.success('Syncing was completed...');
+      toast.success(`${action.payload.update} - Syncing was completed...`);
 
       return { ...state };
     }

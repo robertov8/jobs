@@ -12,15 +12,15 @@ import {
 import api from '../../../services/api';
 import { toast } from 'react-toastify';
 
-export function loadIssues(tab) {
+export function loadIssues(repo, tab) {
   return async dispatch => {
-    const response = await api.get(tab);
+    const response = await api.get(`${repo}/${tab}`);
 
     const total = response.headers['x-count-total'] || 0;
 
     dispatch({
       type: LOAD_ISSUE,
-      payload: { issue: response.data, tab, total },
+      payload: { issue: response.data, repo, tab, total },
     });
   };
 }
@@ -63,13 +63,13 @@ export function markIssueAsFavorite(index, id) {
   };
 }
 
-export function syncIssue() {
+export function syncIssue(repo) {
   return async dispatch => {
-    toast.info('Syncing issues...');
+    toast.info(`${repo} - Syncing issues...`);
 
-    await api.get('issues/sync');
-    dispatch({ type: SYNC_ISSUE });
-    dispatch(loadIssues('issues'));
+    const response = await api.get(`${repo}/issues/sync`);
+    dispatch({ type: SYNC_ISSUE, payload: { update: response.data } });
+    dispatch(loadIssues(repo, 'issues'));
   };
 }
 

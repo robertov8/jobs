@@ -10,7 +10,8 @@ export default createGlobalStyle`
   }
   
   html, body, #root {
-    min-height: 100%;
+    height: 100%;
+    background: rgba(52, 58, 64, 0.5);
   }
   
   body {

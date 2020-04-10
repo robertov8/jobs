@@ -17,10 +17,21 @@ export const ListIssuesGroup = styled(ListGroup)`
     justify-content: flex-start;
     align-items: center;
 
+    .active ~ a {
+      color: #000;
+    }
+
     .list-group-item {
       display: flex;
       flex-direction: row;
       align-items: flex-start;
+      color: #fff;
+      background: #343a40;
+      margin-right: 10px;
+
+      & .active {
+        color: #ccc;
+      }
 
       .title {
         flex: 1;

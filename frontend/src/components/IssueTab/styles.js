@@ -2,12 +2,8 @@ import styled from 'styled-components';
 import { Badge, ListGroup } from 'react-bootstrap';
 
 export const ListIssues = styled(ListGroup.Item)`
-  a {
-    color: ${props => (props.active ? '#fff' : '')};
-  }
-
   .btn-link {
-    color: ${props => (props.active ? '#fff' : '')};
+    color: ${props => (props.active ? '#000' : '')};
     padding: 6px 2px;
   }
 `;

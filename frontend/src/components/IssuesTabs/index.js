@@ -8,7 +8,7 @@ import { loadIssues, loadingMore } from '../../store/modules/issue/actions';
 import IssueTab from '../IssueTab';
 
 export default function IssuesTabs() {
-  const { slug } = useParams();
+  const { repo, slug } = useParams();
   const history = useHistory();
 
   const tab = useSelector(state => state.issues.tab);
@@ -37,8 +37,8 @@ export default function IssuesTabs() {
         break;
     }
 
-    history.push(`/${type}`);
-    return dispatch(loadIssues(type));
+    history.push(`/${repo}/${type}`);
+    return dispatch(loadIssues(repo, type));
   }
 
   function handleIssueTab() {

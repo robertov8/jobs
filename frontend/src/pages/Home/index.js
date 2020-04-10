@@ -21,7 +21,7 @@ export default function Home() {
 
         <Col md={8}>
           {body ? (
-            <CardIssue>
+            <CardIssue bg="dark" text="white">
               <Card.Body>
                 <ReactMarkdown source={body} plugins={[breaks]} />
               </Card.Body>
