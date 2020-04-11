@@ -28,14 +28,14 @@ class IssueController {
     const { repo } = req.params;
     const { page = 1 } = req.query;
 
-    const issuesCount = await Issue.find({ repo, isFav: true });
+    const issuesCount = await Issue.find({ repo, isFav: true, isDone: false });
 
     res.header('X-Count-Total', issuesCount.length);
 
     const issues = await Issue.find()
-      .where({ repo, isFav: true })
+      .where({ repo, isFav: true, isDone: false })
       .sort({
-        createdAt: 1,
+        updatedAt: -1,
       })
       .skip((page - 1) * pagination)
       .limit(pagination);
@@ -100,10 +100,9 @@ class IssueController {
 
         response.data.forEach(issue => {
           Issue.findOne({ id: issue.id }).then(issueResult => {
-            update += 1;
-            console.log(update);
-
             if (!issueResult) {
+              update += 1;
+
               return Issue.create({
                 ...issue,
                 repo,
