@@ -1,8 +1,12 @@
 import styled from 'styled-components';
-import { Card } from 'react-bootstrap';
 
-export const CardIssue = styled(Card)`
-  .card-body {
-    margin: 2px 15px;
-  }
+export const SideBar = styled.div`
+  overflow-y: auto;
+  max-width: 40%;
+  height: 94vh;
+`;
+
+export const Card = styled.div`
+  overflow-y: auto;
+  height: 92vh;
 `;

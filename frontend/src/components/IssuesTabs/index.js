@@ -2,10 +2,12 @@ import React, { useEffect } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { ListIssuesGroup, Nav, Tabs, Tab, Loading } from './styles';
-
 import { loadIssues, loadingMore } from '../../store/modules/issue/actions';
 import IssueTab from '../IssueTab';
+import NavPills from '../NavPills';
+import NavPillsContent from '../NavPillsContent';
+
+import { Loading } from './styles';
 
 export default function IssuesTabs() {
   const { repo, slug } = useParams();
@@ -22,62 +24,58 @@ export default function IssuesTabs() {
     tabSelect(slug);
   }, []);
 
-  function tabSelect(tab) {
-    let type = 'issues';
-
-    switch (tab) {
-      case 'done':
-        type = 'done';
-        break;
-      case 'favorites':
-        type = 'favorites';
-        break;
-      default:
-        type = 'issues';
-        break;
-    }
-
-    history.push(`/${repo}/${type}`);
-    return dispatch(loadIssues(repo, type));
+  function tabSelect(tab = 'issues') {
+    history.push(`/${repo}/${tab}`);
+    return dispatch(loadIssues(repo, tab));
   }
 
   function handleIssueTab() {
     return (
-      <>
+      <ul className="list-group">
         {issues.map((issue, index) => (
           <IssueTab key={issue.id} index={index} issue={issue} />
         ))}
 
-        <Loading onClick={() => dispatch(loadingMore())}>
+        <Loading onClick={() => dispatch(loadingMore(repo, tab))}>
           Loading more...
         </Loading>
-      </>
+      </ul>
     );
   }
 
   return (
-    <ListIssuesGroup id="sideBar">
-      <Nav variant="pills">
-        <Tabs
-          defaultActiveKey="issues"
-          variant="pills"
-          className="mb-1"
-          activeKey={tab}
-          onSelect={tab => tabSelect(tab)}
-        >
-          <Tab title="Issues" eventKey="issues">
-            {tab === 'issues' && handleIssueTab()}
-          </Tab>
+    <>
+      <ul className="nav nav-pills nav-fill mt-2 mb-2" role="tablist">
+        <NavPills
+          active={tab === 'issues'}
+          name="issues"
+          tabSelect={() => tabSelect('issues')}
+        />
+        <NavPills
+          active={tab === 'favorites'}
+          name="favorites"
+          tabSelect={() => tabSelect('favorites')}
+        />
+        <NavPills
+          active={tab === 'done'}
+          name="done"
+          tabSelect={() => tabSelect('done')}
+        />
+      </ul>
 
-          <Tab title="Favorite" eventKey="favorites">
-            {tab === 'favorites' && handleIssueTab()}
-          </Tab>
+      <div className="tab-content">
+        <NavPillsContent active={tab === 'issues'}>
+          {tab === 'issues' && handleIssueTab()}
+        </NavPillsContent>
 
-          <Tab title="Done" eventKey="done">
-            {tab === 'done' && handleIssueTab()}
-          </Tab>
-        </Tabs>
-      </Nav>
-    </ListIssuesGroup>
+        <NavPillsContent active={tab === 'favorites'}>
+          {tab === 'favorites' && handleIssueTab()}
+        </NavPillsContent>
+
+        <NavPillsContent active={tab === 'done'}>
+          {tab === 'done' && handleIssueTab()}
+        </NavPillsContent>
+      </div>
+    </>
   );
 }

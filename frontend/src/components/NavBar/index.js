@@ -1,67 +1,95 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { Button, Nav, Navbar } from 'react-bootstrap';
-import { MdUpdate } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
+import { MdUpdate, MdSubject } from 'react-icons/md';
 
-import { loadIssues, syncIssue } from '../../store/modules/issue/actions';
+import NavItem from './NavItem';
+
+import {
+  changeRepository,
+  loadIssues,
+  syncIssue,
+} from '../../store/modules/issue/actions';
 
 // import { Container } from './styles';
 
 export default function NavBar() {
-  const [repoNav, setRepoNav] = useState('frontendbr');
-  const { tabSize } = useSelector(state => state.issues);
   const dispatch = useDispatch();
 
-  const handleChangeRepo = useCallback(repo => {
-    setRepoNav(repo);
+  const [menu, setMenu] = useState(false);
+  const { repo, tabSize } = useSelector(state => state.issues);
+
+  function handleChangeRepo(newRepo) {
     dispatch(loadIssues(repo, 'issues'));
-  }, []);
+    dispatch(changeRepository(newRepo));
+  }
 
   return (
-    <Navbar bg="dark" variant="dark" sticky="top" className="mb-1">
-      <NavLink className="" to="/">
-        <Navbar.Brand>GJ {tabSize ? `(${tabSize})` : ''}</Navbar.Brand>
+    <nav className="navbar navbar-expand-md navbar-dark bg-dark sticky-top">
+      <NavLink className="navbar-brand" to="/">
+        GJ
       </NavLink>
 
-      <Navbar.Toggle aria-controls="nav" />
+      <button
+        className="navbar-toggler"
+        type="button"
+        data-toggle="collapse"
+        aria-controls="navbarNav"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+        onClick={() => setMenu(!menu)}>
+        <span className="navbar-toggler-icon" />
+      </button>
 
-      <Navbar.Collapse id="nav">
-        <Nav className="mr-auto">
-          <NavLink
-            className="nav-link"
+      <div
+        id="navbarNav"
+        className={`collapse navbar-collapse ${menu ? 'show' : ''}`}>
+        <div className="navbar-nav mr-auto">
+          <NavItem
+            active={repo === 'frontendbr'}
             to="/frontendbr/issues"
-            onClick={() => handleChangeRepo('frontendbr')}
-          >
-            frontend-br
-          </NavLink>
-          <NavLink
-            className="nav-link"
-            to="/backend-br/issues"
-            onClick={() => handleChangeRepo('backend-br')}
-          >
-            backend-br
-          </NavLink>
-          <NavLink
-            className="nav-link"
-            to="/react-brasil/issues"
-            onClick={() => handleChangeRepo('react-brasil')}
-          >
-            react-brasil
-          </NavLink>
-          <NavLink
-            className="nav-link"
-            to="/phpdevbr/issues"
-            onClick={() => handleChangeRepo('phpdevbr')}
-          >
-            phpdevbr
-          </NavLink>
-        </Nav>
+            name="frontend-br"
+            changeRepo={() => handleChangeRepo('frontendbr')}
+          />
 
-        <Button type="button" onClick={() => dispatch(syncIssue(repoNav))}>
+          <NavItem
+            active={repo === 'backend-br'}
+            to="/backend-br/issues"
+            name="backend-br"
+            changeRepo={() => handleChangeRepo('backend-br')}
+          />
+
+          <NavItem
+            active={repo === 'react-brasil'}
+            to="/react-brasil/issues"
+            name="react-brasil"
+            changeRepo={() => handleChangeRepo('react-brasil')}
+          />
+
+          <NavItem
+            active={repo === 'phpdevbr'}
+            to="/phpdevbr/issues"
+            name="phpdevbr"
+            changeRepo={() => handleChangeRepo('phpdevbr')}
+          />
+        </div>
+
+        <button
+          className="btn btn-outline-light mr-3"
+          type="button"
+          disabled
+          onClick={() => dispatch(syncIssue(repo))}>
+          <MdSubject />
+          {tabSize ? tabSize : ''}
+        </button>
+
+        <button
+          className="btn btn-outline-primary"
+          type="button"
+          onClick={() => dispatch(syncIssue(repo))}>
           <MdUpdate />
-        </Button>
-      </Navbar.Collapse>
-    </Navbar>
+        </button>
+      </div>
+    </nav>
   );
 }

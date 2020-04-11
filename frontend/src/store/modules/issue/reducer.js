@@ -1,6 +1,7 @@
 import { toast } from 'react-toastify';
 import {
   CENTER_BODY_ISSUE,
+  CHANGE_REPOSITORY,
   LOAD_ISSUE,
   LOADING_MORE_ISSUE,
   MARK_ISSUE_DONE,
@@ -14,6 +15,7 @@ import {
 const STATE = {
   page: 1,
   tab: 'issues',
+  repo: 'frontendbr',
   tabSize: 0,
   active: 0,
   body: '',
@@ -78,6 +80,9 @@ export default function issues(state = STATE, action) {
       window.scrollTo(0, 0);
       return { ...state };
     }
+    case CHANGE_REPOSITORY: {
+      return { ...state, repo: action.payload };
+    }
     default:
       return state;
   }
@@ -85,7 +90,12 @@ export default function issues(state = STATE, action) {
 
 function markIssue(payload, state, type = 'isFav') {
   state.issue[payload.index][type] = payload.issue[type];
-  return { ...state, issue: [...state.issue] };
+
+  const total = state.issue.filter(
+    issue => issue.isDone === false || !issue.isFav === false
+  );
+
+  return { ...state, tabSize: total.length, issue: [...state.issue] };
 }
 
 function selectIssue(state, operation) {

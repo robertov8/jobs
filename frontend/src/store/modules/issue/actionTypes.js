@@ -12,3 +12,5 @@ export const NEXT_ISSUE = '@issue/NEXT_ISSUE';
 export const PREVIOUS_ISSUE = '@issue/PREVIOUS_ISSUE';
 
 export const CENTER_BODY_ISSUE = '@issue/CENTER_BODY_ISSUE';
+
+export const CHANGE_REPOSITORY = '@issue/CHANGE_REPOSITORY';

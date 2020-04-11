@@ -1,14 +1,23 @@
 import styled from 'styled-components';
-import { Badge, ListGroup } from 'react-bootstrap';
 
-export const ListIssues = styled(ListGroup.Item)`
-  .btn-link {
-    color: ${props => (props.active ? '#000' : '')};
-    padding: 6px 2px;
+export const ListGroupItem = styled.li.attrs({
+  className: 'list-group-item list-group-item-action list-group-item-secondary',
+})`
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+
+  .title {
+    flex: 1;
+    flex-direction: column;
+    cursor: pointer;
   }
-`;
 
-export const Labels = styled(Badge)`
-  margin: 2px;
-  background-color: #${props => props.color || '#fff'} !important;
+  .actions {
+    flex-direction: row;
+
+    svg {
+      margin: 5px;
+    }
+  }
 `;

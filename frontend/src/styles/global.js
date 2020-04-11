@@ -1,5 +1,7 @@
 import { createGlobalStyle } from 'styled-components';
+
 import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/js/bootstrap.min';
 
 export default createGlobalStyle`
   * {

@@ -8,6 +8,7 @@ import {
   PREVIOUS_ISSUE,
   SHOW_ISSUE,
   SYNC_ISSUE,
+  CHANGE_REPOSITORY,
 } from './actionTypes';
 import api from '../../../services/api';
 import { toast } from 'react-toastify';
@@ -25,12 +26,12 @@ export function loadIssues(repo, tab) {
   };
 }
 
-export function loadingMore() {
+export function loadingMore(repo, tab) {
   return async (dispatch, getState) => {
     const { issues } = getState();
     const page = issues.page + 1;
 
-    const response = await api.get(`${issues.tab}?page=${page}`);
+    const response = await api.get(`${repo}/${tab}?page=${page}`);
 
     dispatch({
       type: LOADING_MORE_ISSUE,
@@ -109,4 +110,8 @@ export function markIssueAsFavoriteHotKey() {
 
 export function centerBodyIssue() {
   return { type: CENTER_BODY_ISSUE };
+}
+
+export function changeRepository(repo) {
+  return { type: CHANGE_REPOSITORY, payload: repo };
 }
