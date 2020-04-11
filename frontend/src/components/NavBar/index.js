@@ -20,7 +20,7 @@ export default function NavBar() {
   const { repo, tabSize } = useSelector(state => state.issues);
 
   function handleChangeRepo(newRepo) {
-    dispatch(loadIssues(repo, 'issues'));
+    dispatch(loadIssues(newRepo, 'issues'));
     dispatch(changeRepository(newRepo));
   }
 

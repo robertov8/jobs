@@ -2,7 +2,11 @@ import React, { useEffect } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { loadIssues, loadingMore } from '../../store/modules/issue/actions';
+import {
+  loadIssues,
+  loadingMore,
+  changeRepository,
+} from '../../store/modules/issue/actions';
 import IssueTab from '../IssueTab';
 import NavPills from '../NavPills';
 import NavPillsContent from '../NavPillsContent';
@@ -26,7 +30,8 @@ export default function IssuesTabs() {
 
   function tabSelect(tab = 'issues') {
     history.push(`/${repo}/${tab}`);
-    return dispatch(loadIssues(repo, tab));
+    dispatch(changeRepository(repo));
+    dispatch(loadIssues(repo, tab));
   }
 
   function handleIssueTab() {
